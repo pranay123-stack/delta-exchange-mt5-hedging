@@ -1,0 +1,160 @@
+# Perpetual-exchange instrument catalogue (Delta-Exchange-style).
+#
+# These are ILLUSTRATIVE specifications modelled on the shape of a public
+# perpetual contract spec.  They are configuration, not code: the engine never
+# references any symbol here by name.  Edit, add or delete freely -- including
+# at runtime through /instruments -- and the platform adapts.
+#
+# venue_kind: PERPETUAL_EXCHANGE | MT5_BROKER | SPOT_EXCHANGE
+# quantity_unit: CONTRACT | LOT | BASE_UNIT
+# settlement_style: LINEAR | INVERSE
+
+instruments:
+  - symbol: BTCUSDT-PERP
+    venue: PAPER_DELTA
+    venue_kind: PERPETUAL_EXCHANGE
+    instrument_type: PERPETUAL
+    display_name: Bitcoin Perpetual (linear, USDT settled)
+    base_asset: BTC
+    quote_asset: USDT
+    settlement_asset: USDT
+    underlying_key: BTC
+    quantity_unit: CONTRACT
+    settlement_style: LINEAR
+    contract_size: "0.001"          # 1 contract = 0.001 BTC
+    contract_multiplier: "1"
+    tick_size: "0.5"
+    min_quantity: "1"
+    max_quantity: "500000"
+    quantity_step: "1"
+    price_precision: 1
+    quantity_precision: 0
+    max_leverage: "50"
+    margin_model: ISOLATED_LINEAR
+    initial_margin_rate: "0.02"
+    maintenance_margin_rate: "0.005"
+    maker_fee_bps: "2"
+    taker_fee_bps: "5"
+    typical_spread_bps: "1.5"
+    funding_model: PERPETUAL_FUNDING
+    funding_interval_hours: "8"
+    baseline_funding_rate: "0.0001"  # +1 bp per 8h -> longs pay
+    price_source: simulator
+
+  - symbol: ETHUSDT-PERP
+    venue: PAPER_DELTA
+    venue_kind: PERPETUAL_EXCHANGE
+    instrument_type: PERPETUAL
+    display_name: Ether Perpetual (linear, USDT settled)
+    base_asset: ETH
+    quote_asset: USDT
+    settlement_asset: USDT
+    underlying_key: ETH
+    quantity_unit: CONTRACT
+    settlement_style: LINEAR
+    contract_size: "0.01"           # 1 contract = 0.01 ETH
+    contract_multiplier: "1"
+    tick_size: "0.05"
+    min_quantity: "1"
+    max_quantity: "500000"
+    quantity_step: "1"
+    price_precision: 2
+    quantity_precision: 0
+    max_leverage: "50"
+    initial_margin_rate: "0.02"
+    maintenance_margin_rate: "0.006"
+    maker_fee_bps: "2"
+    taker_fee_bps: "5"
+    typical_spread_bps: "2"
+    funding_model: PERPETUAL_FUNDING
+    funding_interval_hours: "8"
+    baseline_funding_rate: "0.00008"
+
+  - symbol: SOLUSDT-PERP
+    venue: PAPER_DELTA
+    venue_kind: PERPETUAL_EXCHANGE
+    instrument_type: PERPETUAL
+    display_name: Solana Perpetual (linear, USDT settled)
+    base_asset: SOL
+    quote_asset: USDT
+    settlement_asset: USDT
+    underlying_key: SOL
+    quantity_unit: CONTRACT
+    settlement_style: LINEAR
+    contract_size: "1"              # 1 contract = 1 SOL
+    contract_multiplier: "1"
+    tick_size: "0.01"
+    min_quantity: "1"
+    max_quantity: "200000"
+    quantity_step: "1"
+    price_precision: 2
+    quantity_precision: 0
+    max_leverage: "20"
+    initial_margin_rate: "0.05"
+    maintenance_margin_rate: "0.02"
+    maker_fee_bps: "2"
+    taker_fee_bps: "5"
+    typical_spread_bps: "4"
+    funding_model: PERPETUAL_FUNDING
+    funding_interval_hours: "8"
+    baseline_funding_rate: "0.00015"
+
+  - symbol: BTCUSD-PERP-INV
+    venue: PAPER_DELTA
+    venue_kind: PERPETUAL_EXCHANGE
+    instrument_type: PERPETUAL
+    display_name: Bitcoin Inverse Perpetual (coin-margined, BTC settled)
+    base_asset: BTC
+    quote_asset: USD
+    settlement_asset: BTC
+    underlying_key: BTC
+    quantity_unit: CONTRACT
+    settlement_style: INVERSE
+    contract_size: "1"              # 1 contract = 1 USD of notional
+    contract_multiplier: "1"
+    tick_size: "0.5"
+    min_quantity: "1"
+    max_quantity: "10000000"
+    quantity_step: "1"
+    price_precision: 1
+    quantity_precision: 0
+    max_leverage: "50"
+    initial_margin_rate: "0.02"
+    maintenance_margin_rate: "0.005"
+    maker_fee_bps: "2"
+    taker_fee_bps: "7.5"
+    typical_spread_bps: "2"
+    funding_model: PERPETUAL_FUNDING
+    funding_interval_hours: "8"
+    baseline_funding_rate: "0.00012"
+
+  - symbol: PAXGUSDT-PERP
+    venue: PAPER_DELTA
+    venue_kind: PERPETUAL_EXCHANGE
+    instrument_type: PERPETUAL
+    display_name: Tokenised Gold Perpetual (1 token = 1 troy ounce)
+    base_asset: PAXG
+    quote_asset: USDT
+    settlement_asset: USDT
+    # Tracks the same underlying as the broker's gold CFD even though the
+    # base assets are spelled differently -- this is what underlying_key is for.
+    underlying_key: XAU
+    quantity_unit: CONTRACT
+    settlement_style: LINEAR
+    contract_size: "0.01"           # 1 contract = 0.01 oz
+    contract_multiplier: "1"
+    tick_size: "0.1"
+    min_quantity: "1"
+    max_quantity: "100000"
+    quantity_step: "1"
+    price_precision: 1
+    quantity_precision: 0
+    max_leverage: "20"
+    initial_margin_rate: "0.05"
+    maintenance_margin_rate: "0.02"
+    maker_fee_bps: "3"
+    taker_fee_bps: "6"
+    typical_spread_bps: "6"
+    funding_model: PERPETUAL_FUNDING
+    funding_interval_hours: "8"
+    baseline_funding_rate: "0.00005"

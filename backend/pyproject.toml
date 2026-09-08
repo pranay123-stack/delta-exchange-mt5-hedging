@@ -1,0 +1,89 @@
+[project]
+name = "hedgelab"
+version = "1.0.0"
+description = "Cross-Platform Perpetual <-> MT5 Paper Hedging Platform"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "sqlalchemy[asyncio]>=2.0.36",
+    "alembic>=1.14",
+    "asyncpg>=0.30",
+    "aiosqlite>=0.20",
+    "greenlet>=3.1",
+    "redis>=5.2",
+    "pyyaml>=6.0",
+    "typer>=0.15",
+    "rich>=13.9",
+    "httpx>=0.28",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "types-PyYAML",
+]
+
+[project.scripts]
+hedgelab = "hedgelab.cli:app"
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+hedgelab = ["instruments/specs/*.yaml", "py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = ["ignore::DeprecationWarning"]
+markers = ["integration: end-to-end tests that touch the DB and API"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = [
+    "B008",    # FastAPI's Depends() in defaults is the framework's idiom
+    "RUF012",  # ClassVar annotations on enum-adjacent constants add noise
+    # `class X(str, Enum)` rather than `enum.StrEnum`: StrEnum changes what
+    # format() produces, and these values are formatted into log lines, YAML
+    # and API payloads where the plain value is required.
+    "UP042",
+    # Frozen dataclass defaults call Decimal()/RiskParameters(). Both are
+    # immutable, so the shared-mutable-default hazard this rule guards against
+    # does not exist here.
+    "RUF009",
+    # TradingVenue.connect/disconnect are intentional no-op hooks: paper
+    # adapters have no session to establish, and forcing every adapter to
+    # implement an empty method would be worse.
+    "B027",
+]
+
+[tool.mypy]
+python_version = "3.12"
+packages = ["hedgelab"]
+mypy_path = "src"
+strict_optional = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+
+[tool.coverage.run]
+source = ["src/hedgelab"]
+omit = ["*/alembic/*"]

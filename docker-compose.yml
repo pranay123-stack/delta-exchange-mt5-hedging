@@ -1,0 +1,82 @@
+# HedgeLab -- paper hedging platform.
+#
+#   docker compose up --build
+#   dashboard  http://localhost:5174
+#   API docs   http://localhost:8001/docs
+#
+# Host ports are deliberately non-default (5174/8001/5468/6479) so this stack
+# can run alongside other projects. If one is already taken, override it in
+# .env rather than editing this file -- every port is a variable.
+#
+# PAPER TRADING ONLY. The backend refuses to start if HEDGELAB_TRADING_MODE is
+# anything other than PAPER, and no live venue adapter exists in the image.
+
+name: hedgelab
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-hedgelab}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hedgelab}
+      POSTGRES_DB: ${POSTGRES_DB:-hedgelab}
+    ports:
+      - "${POSTGRES_PORT:-5468}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hedgelab} -d ${POSTGRES_DB:-hedgelab}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "${REDIS_PORT:-6479}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      HEDGELAB_TRADING_MODE: PAPER
+      HEDGELAB_ENVIRONMENT: ${HEDGELAB_ENVIRONMENT:-local}
+      HEDGELAB_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-hedgelab}:${POSTGRES_PASSWORD:-hedgelab}@postgres:5432/${POSTGRES_DB:-hedgelab}
+      HEDGELAB_REDIS_URL: redis://redis:6379/0
+      HEDGELAB_LOG_LEVEL: ${HEDGELAB_LOG_LEVEL:-INFO}
+      HEDGELAB_LOG_JSON: ${HEDGELAB_LOG_JSON:-true}
+      HEDGELAB_SIMULATOR_SEED: ${HEDGELAB_SIMULATOR_SEED:-20260908}
+      HEDGELAB_ACCOUNT_CURRENCY: ${HEDGELAB_ACCOUNT_CURRENCY:-USD}
+      HEDGELAB_PAPER_STARTING_BALANCE: ${HEDGELAB_PAPER_STARTING_BALANCE:-250000}
+      # Optional: user:role:key triples, comma separated. Unset means open
+      # access, which is refused outside the local/test environments.
+      HEDGELAB_API_KEYS: ${HEDGELAB_API_KEYS:-}
+    ports:
+      - "${BACKEND_PORT:-8001}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "${FRONTEND_PORT:-5174}:80"
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  postgres-data:

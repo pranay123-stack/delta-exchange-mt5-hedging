@@ -1,0 +1,185 @@
+# MT5 broker instrument catalogue (Exness-style CFD).
+#
+# Same disclaimer as the perpetual catalogue: illustrative configuration built
+# to the shape of a real MT5 symbol specification.  Note the units: a *lot* is
+# the quantity unit, and one lot is a different number of base units for every
+# symbol -- which is precisely why quantity matching between venues is wrong.
+
+instruments:
+  - symbol: BTCUSD
+    venue: PAPER_MT5
+    venue_kind: MT5_BROKER
+    instrument_type: CFD
+    display_name: Bitcoin CFD
+    base_asset: BTC
+    quote_asset: USD
+    settlement_asset: USD
+    underlying_key: BTC
+    quantity_unit: LOT
+    settlement_style: LINEAR
+    contract_size: "1"              # 1 lot = 1 BTC
+    units_per_lot: "1"
+    tick_size: "0.01"
+    min_quantity: "0.01"
+    max_quantity: "50"
+    quantity_step: "0.01"
+    price_precision: 2
+    quantity_precision: 2
+    max_leverage: "100"
+    margin_model: BROKER_LEVERAGE
+    initial_margin_rate: "0.01"
+    maintenance_margin_rate: "0.005"
+    maker_fee_bps: "0"              # broker earns the spread, not commission
+    taker_fee_bps: "0"
+    typical_spread_bps: "8"
+    funding_model: SWAP_POINTS
+    # 1 point = tick_size x units_per_lot = 0.01 x 1 BTC = $0.01/lot.
+    # -5600 points ~= -$56/night on a ~$102.5k lot ~= -20%/yr financing.
+    swap_long_points: "-5600"
+    swap_short_points: "-1800"
+    swap_triple_weekday: 2
+    trading_hours:
+      always_open: true
+
+  # A second BTC contract with a 10x smaller lot.  Brokers really do offer
+  # "mini" variants, and it gives the inverse-perp pair its own hedge
+  # instrument: two enabled mappings must never share one, or the same broker
+  # position would be attributed to both pairs.
+  - symbol: BTCUSDm
+    venue: PAPER_MT5
+    venue_kind: MT5_BROKER
+    instrument_type: CFD
+    display_name: Bitcoin CFD (mini, 0.1 BTC per lot)
+    base_asset: BTC
+    quote_asset: USD
+    settlement_asset: USD
+    underlying_key: BTC
+    quantity_unit: LOT
+    settlement_style: LINEAR
+    contract_size: "0.1"            # 1 lot = 0.1 BTC
+    units_per_lot: "0.1"
+    tick_size: "0.01"
+    min_quantity: "0.1"
+    max_quantity: "500"
+    quantity_step: "0.1"
+    price_precision: 2
+    quantity_precision: 2
+    max_leverage: "100"
+    margin_model: BROKER_LEVERAGE
+    initial_margin_rate: "0.01"
+    maintenance_margin_rate: "0.005"
+    maker_fee_bps: "0"
+    taker_fee_bps: "0"
+    typical_spread_bps: "12"        # wider spread on the mini contract
+    funding_model: SWAP_POINTS
+    # 1 point = 0.01 x 0.1 BTC = $0.001/lot.
+    swap_long_points: "-56000"
+    swap_short_points: "-18000"
+    swap_triple_weekday: 2
+
+  - symbol: ETHUSD
+    venue: PAPER_MT5
+    venue_kind: MT5_BROKER
+    instrument_type: CFD
+    display_name: Ether CFD
+    base_asset: ETH
+    quote_asset: USD
+    settlement_asset: USD
+    underlying_key: ETH
+    quantity_unit: LOT
+    settlement_style: LINEAR
+    contract_size: "10"             # 1 lot = 10 ETH
+    units_per_lot: "10"
+    tick_size: "0.01"
+    min_quantity: "0.01"
+    max_quantity: "200"
+    quantity_step: "0.01"
+    price_precision: 2
+    quantity_precision: 2
+    max_leverage: "100"
+    margin_model: BROKER_LEVERAGE
+    initial_margin_rate: "0.01"
+    maintenance_margin_rate: "0.005"
+    maker_fee_bps: "0"
+    taker_fee_bps: "0"
+    typical_spread_bps: "10"
+    funding_model: SWAP_POINTS
+    # 1 point = 0.01 x 10 ETH = $0.10/lot; -210 pts ~= -$21/night on ~$38.5k.
+    swap_long_points: "-210"
+    swap_short_points: "-70"
+
+  - symbol: XAUUSD
+    venue: PAPER_MT5
+    venue_kind: MT5_BROKER
+    instrument_type: CFD
+    display_name: Gold vs US Dollar
+    base_asset: XAU
+    quote_asset: USD
+    settlement_asset: USD
+    underlying_key: XAU
+    quantity_unit: LOT
+    settlement_style: LINEAR
+    contract_size: "100"            # 1 lot = 100 troy ounces
+    units_per_lot: "100"
+    tick_size: "0.01"
+    min_quantity: "0.01"
+    max_quantity: "100"
+    quantity_step: "0.01"
+    price_precision: 2
+    quantity_precision: 2
+    max_leverage: "200"
+    margin_model: BROKER_LEVERAGE
+    initial_margin_rate: "0.005"
+    maintenance_margin_rate: "0.0025"
+    maker_fee_bps: "0"
+    taker_fee_bps: "0"
+    typical_spread_bps: "2"
+    funding_model: SWAP_POINTS
+    # 1 point = 0.01 x 100 oz = $1.00/lot; -33 pts ~= -$33/night on ~$242k ~= -5%/yr.
+    swap_long_points: "-33"
+    swap_short_points: "11"         # positive: short gold earns carry
+    swap_triple_weekday: 2
+    trading_hours:
+      always_open: false
+      timezone: UTC
+      sessions:
+        - days: [0, 1, 2, 3]
+          start: "00:00:00"
+          end: "23:59:59"
+        - days: [4]
+          start: "00:00:00"
+          end: "20:55:00"
+        - days: [6]
+          start: "22:05:00"
+          end: "23:59:59"
+
+  - symbol: SOLUSD
+    venue: PAPER_MT5
+    venue_kind: MT5_BROKER
+    instrument_type: CFD
+    display_name: Solana CFD
+    base_asset: SOL
+    quote_asset: USD
+    settlement_asset: USD
+    underlying_key: SOL
+    quantity_unit: LOT
+    settlement_style: LINEAR
+    contract_size: "100"            # 1 lot = 100 SOL
+    units_per_lot: "100"
+    tick_size: "0.01"
+    min_quantity: "0.1"
+    max_quantity: "500"
+    quantity_step: "0.1"
+    price_precision: 2
+    quantity_precision: 2
+    max_leverage: "50"
+    margin_model: BROKER_LEVERAGE
+    initial_margin_rate: "0.02"
+    maintenance_margin_rate: "0.01"
+    maker_fee_bps: "0"
+    taker_fee_bps: "0"
+    typical_spread_bps: "15"
+    funding_model: SWAP_POINTS
+    # 1 point = 0.01 x 100 SOL = $1.00/lot.
+    swap_long_points: "-10"
+    swap_short_points: "-3"

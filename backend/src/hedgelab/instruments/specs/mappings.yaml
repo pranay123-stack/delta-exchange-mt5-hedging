@@ -1,0 +1,52 @@
+# Hedge pairs: which instrument hedges which, and with what objective.
+#
+# Adding a pair is a configuration change.  The engine resolves both sides
+# through the registry and never special-cases a symbol.
+
+mappings:
+  - name: BTC perp -> BTC CFD
+    source: PAPER_DELTA:BTCUSDT-PERP
+    hedge: PAPER_MT5:BTCUSD
+    objective: QUOTE_PNL_NEUTRAL
+    target_ratio: "1.0"
+    tolerance_bps: "25"
+    max_notional: "2000000"
+    enabled: true
+
+  - name: ETH perp -> ETH CFD (10 ETH per lot)
+    source: PAPER_DELTA:ETHUSDT-PERP
+    hedge: PAPER_MT5:ETHUSD
+    objective: BASE_ASSET_NEUTRAL
+    target_ratio: "1.0"
+    tolerance_bps: "30"
+    max_notional: "1000000"
+    enabled: true
+
+  - name: Gold perp -> XAUUSD (cross-named underlying)
+    source: PAPER_DELTA:PAXGUSDT-PERP
+    hedge: PAPER_MT5:XAUUSD
+    objective: NOTIONAL_NEUTRAL
+    target_ratio: "1.0"
+    tolerance_bps: "40"
+    max_notional: "750000"
+    enabled: true
+
+  # Uses the mini contract, not BTCUSD: no two enabled mappings may share a
+  # hedge instrument, or one broker position would be counted by both pairs.
+  - name: Inverse BTC perp -> BTC mini CFD
+    source: PAPER_DELTA:BTCUSD-PERP-INV
+    hedge: PAPER_MT5:BTCUSDm
+    objective: QUOTE_PNL_NEUTRAL
+    target_ratio: "1.0"
+    tolerance_bps: "25"
+    max_notional: "1500000"
+    enabled: true
+
+  - name: SOL perp -> SOL CFD (100 SOL per lot)
+    source: PAPER_DELTA:SOLUSDT-PERP
+    hedge: PAPER_MT5:SOLUSD
+    objective: BASE_ASSET_NEUTRAL
+    target_ratio: "1.0"
+    tolerance_bps: "50"
+    max_notional: "400000"
+    enabled: true
