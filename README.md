@@ -78,8 +78,13 @@ shipped catalogue, computed by the engine:
 1 ETHUSDT-PERP contract (1 contract = 0.01 ETH)   = 0.001     ETHUSD  lot (1 lot = 10 ETH)
 1 PAXGUSDT-PERP contract (1 contract = 0.01 PAXG) = 0.0001    XAUUSD  lot (1 lot = 100 XAU)
 1 SOLUSDT-PERP contract (1 contract = 1 SOL)      = 0.01      SOLUSD  lot (1 lot = 100 SOL)
-1 BTCUSD-PERP-INV contract (1 contract = 1 USD)   = 0.0000975 BTCUSDm lot (1 lot = 0.1 BTC)
+1 BTCUSD-PERP-INV contract (1 contract = 1 USD)   = ~0.0000976  BTCUSDm lot (1 lot = 0.1 BTC)
 ```
+
+The first four are fixed by the contract specifications. The fifth is not: an
+inverse contract is denominated in *quote* units, so how much base asset it
+represents moves with the price. That ratio is recomputed on every call, which
+is the first hint that inverse instruments need their own treatment.
 
 Hedging 1000 perpetual contracts with "1000 lots" is a **1000× position
 error**, not a rounding problem. Note also that BTC and ETH happen to share a
